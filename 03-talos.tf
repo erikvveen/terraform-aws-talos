@@ -106,7 +106,7 @@ resource "talos_machine_bootstrap" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = module.talos_control_plane_nodes.0.public_ip
   # node                 = module.talos_control_plane_nodes.0.private_ip
-  node = "${var.cluster_name}-control-plane-${count.index}"
+  node = "${var.cluster_name}-control-plane-0"
 
 }
 
