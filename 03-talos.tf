@@ -114,7 +114,7 @@ resource "talos_machine_bootstrap" "this" {
 data "talos_client_configuration" "this" {
   cluster_name         = var.cluster_name
   client_configuration = talos_machine_secrets.this.client_configuration
-  endpoints            = module.talos_worker_group.*.public_ip
+  endpoints            = module.talos_control_plane_nodes.*.public_ip
 }
 
 resource "local_file" "talosconfig" {
