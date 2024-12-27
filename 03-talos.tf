@@ -110,12 +110,18 @@ resource "talos_machine_bootstrap" "this" {
   node                 = module.talos_control_plane_nodes[0].id
 
 }
-
+output "bootstrap" {
+  value = talos_machine_bootstrap.this{
+}
+}
 data "talos_client_configuration" "this" {
   cluster_name         = var.cluster_name
   client_configuration = talos_machine_secrets.this.client_configuration
   # endpoints            = module.talos_control_plane_nodes.*.public_ip
-  endpoints = module.talos_control_plane_nodes.*.public_dns
+  endpoints = module.talos_control_plane_nodes.*.public_ip
+}
+output "client_configuration" {
+  value = data.talos_client_configuration.this
 }
 
 resource "local_file" "talosconfig" {
