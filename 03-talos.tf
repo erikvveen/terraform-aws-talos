@@ -115,8 +115,7 @@ resource "talos_machine_bootstrap" "this" {
 
 }
 output "bootstrap" {
-  value = talos_machine_bootstrap.this {
-}
+  value = talos_machine_bootstrap.this 
 }
 data "talos_client_configuration" "this" {
   cluster_name         = var.cluster_name
