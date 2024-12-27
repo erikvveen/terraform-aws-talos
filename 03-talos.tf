@@ -89,6 +89,10 @@ resource "talos_machine_configuration_apply" "controlplane" {
   # node                        = module.talos_control_plane_nodes[count.index].private_ip
   node                        = module.talos_control_plane_nodes[count.index].id
 }
+output "config" {
+  value = talos_machine_configuration_apply.controlplane
+  
+}
 
 resource "talos_machine_configuration_apply" "worker_group" {
   for_each = merge([for info in var.worker_groups : { for index in range(0, var.workers_count) : "${info.name}.${index}" => info }]...)
@@ -111,7 +115,7 @@ resource "talos_machine_bootstrap" "this" {
 
 }
 output "bootstrap" {
-  value = talos_machine_bootstrap.this{
+  value = talos_machine_bootstrap.this {
 }
 }
 data "talos_client_configuration" "this" {
