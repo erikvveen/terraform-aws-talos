@@ -28,13 +28,19 @@ locals {
       id          = var.cluster_id,
       clusterName = var.cluster_name,
       apiServer = {
-        certSANs = [
-          module.elb_k8s_elb.elb_dns_name
-        ]
+        extraArgs = {
+          cloud-provider = "external"
+          enable-admission-plugins = "MutatingAdmissionWebhook,ValidatingAdmissionWebhook, ServiceAccount"
+        },
+        certSANs = [ 
+          module.elb_k8s_elb.elb_dns_name,
+          ]
       },
       controllerManager = {
         extraArgs = {
           allocate-node-cidrs = var.allocate_node_cidrs
+          cloud-provider = "external"
+          leader-elect = true
         }
       },
       network = {
@@ -59,17 +65,19 @@ locals {
         registerWithFQDN = true
       },
       certSANs = [
-        module.elb_k8s_elb.elb_dns_name
+        module.elb_k8s_elb.elb_dns_name,
       ],
       kubelet = {
         extraArgs = {
           rotate-server-certificates = true
+          cloud-provider            = "external"
         }
       }
     }
   }
 
   # Used to configure Cilium Kube-Proxy replacement
+  
   config_cilium_patch = {
     cluster = {
       proxy = {
@@ -85,13 +93,18 @@ locals {
       }
     }
   }
+  
+  
+ 
+    config_patches_common = [
+      for path in var.config_patch_files : file(path)
+    ]
 
-  config_patches_common = [
-    for path in var.config_patch_files : file(path)
-  ]
+  
+ 
+    cluster_required_tags = {
+      "kubernetes.io/cluster/${var.cluster_name}" = "owned"
+    }
 
-  cluster_required_tags = {
-    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
-  }
 
 }
