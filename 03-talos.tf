@@ -76,10 +76,6 @@ data "talos_machine_configuration" "controlplane" {
     [for path in var.control_plane.config_patch_files : file(path)]
   )
 }
-output "controlplane" {
-  value = data.talos_machine_configuration.controlplane
-  
-}
 
 data "talos_machine_configuration" "worker_group" {
   for_each = merge([for info in var.worker_groups : { for index in range(0, var.workers_count) : "${info.name}.${index}" => info }]...)
@@ -117,10 +113,6 @@ resource "talos_machine_configuration_apply" "controlplane" {
   machine_configuration_input = data.talos_machine_configuration.controlplane[count.index].machine_configuration
   endpoint                    = module.talos_control_plane_nodes[count.index].public_ip
   node                        = module.talos_control_plane_nodes[count.index].private_ip
-}
-output "config" {
-  value = talos_machine_configuration_apply.controlplane
-  
 }
 
 resource "talos_machine_configuration_apply" "worker_group" {
