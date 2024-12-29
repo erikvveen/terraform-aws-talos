@@ -130,8 +130,8 @@ resource "talos_machine_bootstrap" "this" {
   depends_on = [talos_machine_configuration_apply.controlplane]
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = module.talos_control_plane_nodes.0.public_ip
-  # node                 = module.talos_control_plane_nodes.0.private_ip
-  node = "ip-${replace(module.talos_control_plane_nodes[0].private_ip, ".", "-")}.ec2.${var.region}.internal"
+  node                 = module.talos_control_plane_nodes.0.private_ip
+  # node = "ip-${replace(module.talos_control_plane_nodes[0].private_ip, ".", "-")}.ec2.${var.region}.internal"
 
 }
 
@@ -153,8 +153,8 @@ resource "talos_cluster_kubeconfig" "this" {
 
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = module.talos_control_plane_nodes.0.public_ip
-  # node                 = module.talos_control_plane_nodes.0.private_ip
-  node = "ip-${replace(module.talos_control_plane_nodes[0].private_ip, ".", "-")}.ec2.${var.region}.internal"
+  node                 = module.talos_control_plane_nodes.0.private_ip
+  # node = "ip-${replace(module.talos_control_plane_nodes[0].private_ip, ".", "-")}.ec2.${var.region}.internal"
 
 }
 
