@@ -66,13 +66,13 @@ locals {
       },
       certSANs = [
         module.elb_k8s_elb.elb_dns_name,
-      ],
-      kubelet = {
-        extraArgs = {
-          rotate-server-certificates = true
-          cloud-provider            = "external"
-        }
-      }
+      ]
+      # kubelet = {
+      #   extraArgs = {
+      #     rotate-server-certificates = true
+      #     cloud-provider            = "external"
+      #   }
+      # }
     }
   }
 
