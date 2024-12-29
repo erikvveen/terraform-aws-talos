@@ -68,7 +68,6 @@ data "talos_machine_configuration" "controlplane" {
           rotate-server-certificates = true
           # hostname-override          = "ip-${replace(module.talos_control_plane_nodes[count.index].private_ip, ".", "-")}.ec2.${var.region}.internal"
           hostname-override          = module.talos_control_plane_nodes[count.index].id
-
           cloud-provider            = "external"
         }
       }
@@ -100,7 +99,6 @@ data "talos_machine_configuration" "worker_group" {
           rotate-server-certificates = true
           # hostname-override          = "ip-${replace(module.talos_worker_group[each.key].private_ip, ".", "-")}.ec2.${var.region}.internal"
           hostname-override          = module.talos_worker_group[each.key].id
-
           cloud-provider            = "external"
         }
       }
@@ -117,6 +115,7 @@ resource "talos_machine_configuration_apply" "controlplane" {
   machine_configuration_input = data.talos_machine_configuration.controlplane[count.index].machine_configuration
   endpoint                    = module.talos_control_plane_nodes[count.index].public_ip
   node                        = module.talos_control_plane_nodes[count.index].private_ip
+  # node = module.talos_control_plane_nodes[count.index].id
   # node = "ip-${replace(module.talos_control_plane_nodes[count.index].private_ip, ".", "-")}.ec2.${var.region}.internal"
 }
 
@@ -126,6 +125,7 @@ resource "talos_machine_configuration_apply" "worker_group" {
   machine_configuration_input = data.talos_machine_configuration.worker_group[each.key].machine_configuration
   endpoint                    = module.talos_worker_group[each.key].public_ip
   node                        = module.talos_worker_group[each.key].private_ip
+  # node = module.talos_worker_group[each.key].id
   # node = "ip-${replace(module.talos_worker_group[each.key].private_ip, ".", "-")}.ec2.${var.region}.internal"
 
 }
@@ -135,6 +135,7 @@ resource "talos_machine_bootstrap" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = module.talos_control_plane_nodes.0.public_ip
   node                 = module.talos_control_plane_nodes.0.private_ip
+  # node = module.talos_control_plane_nodes[0].id
   # node = "ip-${replace(module.talos_control_plane_nodes[0].private_ip, ".", "-")}.ec2.${var.region}.internal"
 
 }
@@ -158,6 +159,7 @@ resource "talos_cluster_kubeconfig" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = module.talos_control_plane_nodes.0.public_ip
   node                 = module.talos_control_plane_nodes.0.private_ip
+  # node = module.talos_control_plane_nodes[0].id
   # node = "ip-${replace(module.talos_control_plane_nodes[0].private_ip, ".", "-")}.ec2.${var.region}.internal"
 
 }
