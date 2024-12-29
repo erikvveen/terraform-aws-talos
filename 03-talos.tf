@@ -66,7 +66,9 @@ data "talos_machine_configuration" "controlplane" {
       kubelet = {
         extraArgs = {
           rotate-server-certificates = true
-          hostname-override          = "ip-${replace(module.talos_control_plane_nodes[count.index].private_ip, ".", "-")}.ec2.${var.region}.internal"
+          # hostname-override          = "ip-${replace(module.talos_control_plane_nodes[count.index].private_ip, ".", "-")}.ec2.${var.region}.internal"
+          hostname-override          = module.talos_control_plane_nodes[count.index].id
+
           cloud-provider            = "external"
         }
       }
@@ -96,7 +98,9 @@ data "talos_machine_configuration" "worker_group" {
       kubelet = {
         extraArgs = {
           rotate-server-certificates = true
-          hostname-override          = "ip-${replace(module.talos_worker_group[each.key].private_ip, ".", "-")}.ec2.${var.region}.internal"
+          # hostname-override          = "ip-${replace(module.talos_worker_group[each.key].private_ip, ".", "-")}.ec2.${var.region}.internal"
+          hostname-override          = module.talos_worker_group[each.key].id
+
           cloud-provider            = "external"
         }
       }
@@ -112,8 +116,8 @@ resource "talos_machine_configuration_apply" "controlplane" {
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane[count.index].machine_configuration
   endpoint                    = module.talos_control_plane_nodes[count.index].public_ip
-  # node                        = module.talos_control_plane_nodes[count.index].private_ip
-  node = "ip-${replace(module.talos_control_plane_nodes[count.index].private_ip, ".", "-")}.ec2.${var.region}.internal"
+  node                        = module.talos_control_plane_nodes[count.index].private_ip
+  # node = "ip-${replace(module.talos_control_plane_nodes[count.index].private_ip, ".", "-")}.ec2.${var.region}.internal"
 }
 
 resource "talos_machine_configuration_apply" "worker_group" {
@@ -121,8 +125,8 @@ resource "talos_machine_configuration_apply" "worker_group" {
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker_group[each.key].machine_configuration
   endpoint                    = module.talos_worker_group[each.key].public_ip
-  # node                        = module.talos_worker_group[each.key].private_ip
-  node = "ip-${replace(module.talos_worker_group[each.key].private_ip, ".", "-")}.ec2.${var.region}.internal"
+  node                        = module.talos_worker_group[each.key].private_ip
+  # node = "ip-${replace(module.talos_worker_group[each.key].private_ip, ".", "-")}.ec2.${var.region}.internal"
 
 }
 
