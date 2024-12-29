@@ -28,7 +28,7 @@ locals {
     
       id          = var.cluster_id,
       clusterName = var.cluster_name,
-        proxy = {
+      proxy = {
         disabled = var.disable_kube_proxy
       },
       apiServer = {

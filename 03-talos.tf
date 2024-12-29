@@ -60,19 +60,28 @@ data "talos_machine_configuration" "controlplane" {
     local.config_patches_common,
     [yamlencode(local.common_config_patch)],
     [yamlencode(local.config_cilium_patch)],
-    [yamlencode(
-      {
-    machine = {
-      kubelet = {
-        extraArgs = {
-          rotate-server-certificates = true
-          hostname-override          = module.talos_control_plane_nodes[count.index].id
-          cloud-provider            = "external"
-        }
-      }
+    # [yamlencode(
+    #   {
+    # machine = {
+    #   kubelet = {
+    #     extraArgs = {
+    #       rotate-server-certificates = true
+    #       hostname-override          = module.talos_control_plane_nodes[count.index].id
+    #       cloud-provider            = "external"
+    #     }
+    #   }
+    # }
+    #   }
+    # )],
+    [{ op ="add"
+    path = "/machine/kubelet/extraArgs/"
+    value = {
+      "rotate-server-certificates" = true
+      "hostname-override"          = module.talos_control_plane_nodes[count.index].id
+      "cloud-provider"            = "external"
+      "--node-labels=node-role.kubernetes.io/control-plane=true"
     }
-      }
-    )],
+    }],
     [for path in var.control_plane.config_patch_files : file(path)]
   )
 }
