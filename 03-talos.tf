@@ -73,16 +73,6 @@ data "talos_machine_configuration" "controlplane" {
     }
       }
     )],
-    [ jsonencode (
-      { 
-      op = "add",
-      path = "/machine/kubelet/extraArgs/",
-      value = [
-      "--node-labels=node-role.kubernetes.io/control-plane=true" ]
-      }
-            )
-    ],
-    
     [for path in var.control_plane.config_patch_files : file(path)]
   )
 }
@@ -146,6 +136,7 @@ data "talos_client_configuration" "this" {
   cluster_name         = var.cluster_name
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoints            = module.talos_control_plane_nodes.*.public_ip
+  nodes                = module.talos_control_plane_nodes.*.private_ip
 }
 
 
