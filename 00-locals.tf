@@ -25,8 +25,12 @@ locals {
 
   common_config_patch = {
     cluster = {
+    
       id          = var.cluster_id,
       clusterName = var.cluster_name,
+        proxy = {
+        disabled = var.disable_kube_proxy
+      },
       apiServer = {
         extraArgs = {
           cloud-provider = "external"

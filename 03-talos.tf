@@ -93,6 +93,7 @@ data "talos_machine_configuration" "worker_group" {
     [yamlencode(
       {
     machine = {
+      
       kubelet = {
         extraArgs = {
           rotate-server-certificates = true
