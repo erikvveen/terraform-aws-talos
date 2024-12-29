@@ -66,7 +66,6 @@ data "talos_machine_configuration" "controlplane" {
       kubelet = {
         extraArgs = {
           rotate-server-certificates = true
-          "node-role.kubernetes.io/control-plane" = "true"
           hostname-override          = module.talos_control_plane_nodes[count.index].id
           cloud-provider            = "external"
         }
