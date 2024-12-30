@@ -50,6 +50,7 @@ resource "talos_machine_secrets" "this" {}
 
 data "talos_machine_configuration" "controlplane" {
   count = var.controlplane_count
+  
   cluster_name       = var.cluster_name
   cluster_endpoint   = "https://${module.elb_k8s_elb.elb_dns_name}"
   machine_type       = "controlplane"
@@ -57,24 +58,25 @@ data "talos_machine_configuration" "controlplane" {
   kubernetes_version = var.kubernetes_version
   talos_version      = var.talos_version
   config_patches = concat(
-    local.config_patches_common,
-    [yamlencode(local.common_config_patch)],
-    [yamlencode(local.config_cilium_patch)],
-    [yamlencode(
-      {
-    machine = {
-      kubelet = {
-        extraArgs = {
-          rotate-server-certificates = true
-          hostname-override          = module.talos_control_plane_nodes[count.index].id
-          cloud-provider            = "external"
-        }
-      }
-    }
-      }
-    )],
-    [for path in var.control_plane.config_patch_files : file(path)]
-  )
+                          local.config_patches_common,
+                          [yamlencode(local.common_config_patch)],
+                          [yamlencode(local.config_cilium_patch)],
+                          [yamlencode(
+                            {
+                              machine = {
+                                kubelet = {
+                                  extraArgs = {
+                                    rotate-server-certificates = true
+                                    hostname-override          = module.talos_control_plane_nodes[count.index].id
+                                    cloud-provider            = "external"
+                                  }
+                                }
+                              }
+                            }
+                          )
+                          ],
+                          [for path in var.control_plane.config_patch_files : file(path)]
+                        )
 }
 
 data "talos_machine_configuration" "worker_group" {
@@ -87,29 +89,30 @@ data "talos_machine_configuration" "worker_group" {
   kubernetes_version = var.kubernetes_version
   talos_version      = var.talos_version
   config_patches = concat(
-    local.config_patches_common,
-    [yamlencode(local.common_config_patch)],
-    [yamlencode(local.config_cilium_patch)],
-    [yamlencode(
-      {
-    machine = {
-      
-      kubelet = {
-        extraArgs = {
-          rotate-server-certificates = true
-          hostname-override          = module.talos_worker_group[each.key].id
-          cloud-provider            = "external"
-        }
-      }
-    }
-      }
-    )],
-    [for path in each.value.config_patch_files : file(path)]
-  )
+                          local.config_patches_common,
+                          [yamlencode(local.common_config_patch)],
+                          [yamlencode(local.config_cilium_patch)],
+                          [yamlencode(
+                            {
+                              machine = {
+                                kubelet = {
+                                  extraArgs = {
+                                    rotate-server-certificates = true
+                                    hostname-override          = module.talos_worker_group[each.key].id
+                                    cloud-provider            = "external"
+                                  }
+                                }
+                              }
+                            }
+                           )
+                          ],
+                            [for path in each.value.config_patch_files : file(path)]
+                        )
 }
 
 resource "talos_machine_configuration_apply" "controlplane" {
   count = var.controlplane_count
+  
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane[count.index].machine_configuration
   endpoint                    = module.talos_control_plane_nodes[count.index].public_ip
@@ -118,6 +121,7 @@ resource "talos_machine_configuration_apply" "controlplane" {
 
 resource "talos_machine_configuration_apply" "worker_group" {
   for_each = merge([for info in var.worker_groups : { for index in range(0, var.workers_count) : "${info.name}.${index}" => info }]...)
+  
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker_group[each.key].machine_configuration
   endpoint                    = module.talos_worker_group[each.key].public_ip
@@ -126,11 +130,11 @@ resource "talos_machine_configuration_apply" "worker_group" {
 
 resource "talos_machine_bootstrap" "this" {
   depends_on = [talos_machine_configuration_apply.controlplane]
+  
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = module.talos_control_plane_nodes.0.public_ip
   node                 = module.talos_control_plane_nodes.0.private_ip
 }
-
 
 data "talos_client_configuration" "this" {
   cluster_name         = var.cluster_name
@@ -138,7 +142,6 @@ data "talos_client_configuration" "this" {
   endpoints            = module.talos_control_plane_nodes.*.public_ip
   nodes                = module.talos_control_plane_nodes.*.private_ip
 }
-
 
 resource "local_file" "talosconfig" {
   content  = nonsensitive(data.talos_client_configuration.this.talos_config)
