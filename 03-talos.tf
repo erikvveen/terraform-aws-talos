@@ -66,9 +66,7 @@ data "talos_machine_configuration" "controlplane" {
                               machine = {
                                 kubelet = {
                                   extraArgs = {
-                                    rotate-server-certificates = true
                                     hostname-override          = module.talos_control_plane_nodes[count.index].id
-                                    cloud-provider            = "external"
                                   }
                                 }
                               }
@@ -97,9 +95,7 @@ data "talos_machine_configuration" "worker_group" {
                               machine = {
                                 kubelet = {
                                   extraArgs = {
-                                    rotate-server-certificates = true
                                     hostname-override          = module.talos_worker_group[each.key].id
-                                    cloud-provider            = "external"
                                   }
                                 }
                               }

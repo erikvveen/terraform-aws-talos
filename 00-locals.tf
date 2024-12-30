@@ -28,9 +28,6 @@ locals {
     
       id          = var.cluster_id,
       clusterName = var.cluster_name,
-      proxy = {
-        disabled = var.disable_kube_proxy
-      },
       apiServer = {
         extraArgs = {
           cloud-provider = "external"
@@ -70,7 +67,13 @@ locals {
       },
       certSANs = [
         module.elb_k8s_elb.elb_dns_name,
-      ]
+      ],
+      kubelet = {
+        extraArgs = {
+          rotate-server-certificates = true
+          cloud-provider = "external"
+        }
+      }
     }
   }
 
