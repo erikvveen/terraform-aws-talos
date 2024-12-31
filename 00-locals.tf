@@ -40,6 +40,7 @@ locals {
       controllerManager = {
         extraArgs = {
           allocate-node-cidrs = var.allocate_node_cidrs
+          external-cloud-volume-plugin = "aws"
           cloud-provider = "external"
           leader-elect = true
         }
