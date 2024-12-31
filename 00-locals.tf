@@ -41,7 +41,7 @@ locals {
         extraArgs = {
           allocate-node-cidrs = var.allocate_node_cidrs
           cloud-provider = "external"
-          external-cloud-volume-plugin = aws
+          "external-cloud-volume-plugin" = "aws"
           leader-elect = true
         }
       },

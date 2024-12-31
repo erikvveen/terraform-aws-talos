@@ -97,6 +97,7 @@ data "talos_machine_configuration" "worker_group" {
                                       extraArgs = {
                                         hostname-override          = module.talos_worker_group[each.key].id
                                       }
+                                      
                                     }
                                   }
                                 }
