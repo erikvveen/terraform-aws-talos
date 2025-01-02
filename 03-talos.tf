@@ -68,11 +68,6 @@ data "talos_machine_configuration" "controlplane" {
                                       extraArgs = {
                                         hostname-override          = module.talos_control_plane_nodes[count.index].id
                                       }
-                                    },
-                                    controllerManager = {
-                                      extraArgs = {
-                                        external-cloud-volume-plugin = "aws"
-                                      }
                                     }
                                   }
                                 }
