@@ -100,8 +100,6 @@ locals {
     config_patches_common = [
       for path in var.config_patch_files : file(path)
     ]
-
-  
  
     cluster_required_tags = {
       "kubernetes.io/cluster/${var.cluster_name}" = "owned"
