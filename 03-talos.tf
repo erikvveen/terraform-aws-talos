@@ -71,7 +71,7 @@ data "talos_machine_configuration" "controlplane" {
           }
         }
       }
-      )
+     )
     ],
     [for path in var.control_plane.config_patch_files : file(path)]
   )
@@ -100,7 +100,7 @@ data "talos_machine_configuration" "worker_group" {
           }
         }
       }
-      )
+     )
     ],
     [for path in each.value.config_patch_files : file(path)]
   )
@@ -134,6 +134,7 @@ resource "talos_machine_bootstrap" "this" {
 data "talos_client_configuration" "this" {
   cluster_name         = var.cluster_name
   client_configuration = talos_machine_secrets.this.client_configuration
+  endpoints            = [module.talos_control_plane_nodes.*.public_ip]    
 }
 
 resource "local_file" "talosconfig" {
