@@ -61,18 +61,18 @@ data "talos_machine_configuration" "controlplane" {
     local.config_patches_common,
     [yamlencode(local.common_config_patch)],
     [yamlencode(local.config_cilium_patch)],
-    [yamlencode(
-      {
-        machine = {
-          kubelet = {
-            extraArgs = {
-              hostname-override = module.talos_control_plane_nodes[each.key].id
-            }
-          }
-        }
-      }
-     )
-    ],
+    # [yamlencode(
+    #   {
+    #     machine = {
+    #       kubelet = {
+    #         extraArgs = {
+    #           hostname-override = module.talos_control_plane_nodes[each.key].id
+    #         }
+    #       }
+    #     }
+    #   }
+    #  )
+    # ],
     [for path in var.control_plane.config_patch_files : file(path)]
   )
 }
