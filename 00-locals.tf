@@ -27,6 +27,12 @@ locals {
     cluster = {
       id          = var.cluster_id,
       clusterName = var.cluster_name,
+      externalCloudProvider = {
+        enabled = var.enable_external_cloud_provider
+        manifests = [
+          var.enable_external_cloud_provider ? var.external_cloud_provider_manifest : null,
+        ]
+      },
       apiServer = {
         certSANs = [
           module.elb_k8s_elb.elb_dns_name
@@ -38,7 +44,6 @@ locals {
       controllerManager = {
         extraArgs = {
           allocate-node-cidrs = var.allocate_node_cidrs
-          cloud-provider      = "external"
         }
       },
       network = {
@@ -59,22 +64,19 @@ locals {
       allowSchedulingOnControlPlanes = var.allow_workload_on_cp_nodes
     },
     machine = {
-      kubelet = {
-        registerWithFQDN = true
-      },
       certSANs = [
         module.elb_k8s_elb.elb_dns_name
       ],
       kubelet = {
         extraArgs = {
           rotate-server-certificates = true
-          cloud-provider             = "external"
-        }
+        },
+        registerWithFQDN = true
       }
     }
   }
 
-# Used to configure Cilium Kube-Proxy replacement  
+  # Used to configure Cilium Kube-Proxy replacement
   config_cilium_patch = {
     cluster = {
       proxy = {

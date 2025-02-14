@@ -26,9 +26,8 @@ variable "metadata_options" {
   type        = map(string)
   default = {
     http_endpoint               = "enabled"
-    http_tokens                 = "required"
-    http_put_response_hop_limit = 2
-    instance_metadata_tags      = "disabled"
+    http_tokens                 = "optional"
+    http_put_response_hop_limit = 1
   }
 }
 
@@ -78,7 +77,7 @@ variable "disable_kube_proxy" {
 
 variable "allow_workload_on_cp_nodes" {
   default     = false
-  description = "Allow workloads on CP nodes or not. Allowing it means Talos Linux default taints are removed from CP nodes. More details here: https://www.talos.dev/v1.5/talos-guides/howto/workers-on-controlplane/"
+  description = "Allow workloads on CP nodes or not. Allowing it means Talos Linux default taints are removed from CP nodes which is typically required for single-node clusters. More details here: https://www.talos.dev/v1.5/talos-guides/howto/workers-on-controlplane/"
   type        = bool
 }
 
@@ -171,4 +170,26 @@ variable "admission_plugins" {
   description = "List of admission plugins to enable"
   type        = string
   default     = "MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ServiceAccount"
+}
+
+variable "enable_external_cloud_provider" {
+  default     = false
+  description = "Whether to enable or disable externalCloudProvider support. See https://kubernetes.io/docs/tasks/administer-cluster/running-cloud-controller/."
+  type        = bool
+}
+
+variable "deploy_external_cloud_provider_iam_policies" {
+  default     = false
+  description = "Whether to auto-deploy the externalCloudProvider-required IAM policies. See https://cloud-provider-aws.sigs.k8s.io/prerequisites/."
+  type        = bool
+  validation {
+    condition     = (var.deploy_external_cloud_provider_iam_policies && var.enable_external_cloud_provider) || (!var.deploy_external_cloud_provider_iam_policies)
+    error_message = "externalCloudProvider support needs to be enabled when trying to deploy the externalCloudProvider-required IAM policies."
+  }
+}
+
+variable "external_cloud_provider_manifest" {
+  default     = "https://raw.githubusercontent.com/isovalent/terraform-aws-talos/main/aws-cloud-controller.yaml"
+  description = "externalCloudProvider manifest to be applied if var.enable_external_cloud_provider is enabled. If you want to deploy it manually (e.g., via Helm chart), enable var.enable_external_cloud_provider but set this value to an empty string (\"\"). See https://kubernetes.io/docs/tasks/administer-cluster/running-cloud-controller/."
+  type        = string
 }
